@@ -22,14 +22,14 @@ class Grid
      *
      * @var int
      */
-    protected $moves;
+    protected $moves = 0;
 
     /**
      * Count of backtracks we've made - for debug / optimisation
      *
      * @var int
      */
-    protected $undos;
+    protected $undos = 0;
 
     public function __construct()
     {

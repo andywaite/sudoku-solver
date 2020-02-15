@@ -90,31 +90,34 @@ class Solver
             for ($y = 0; $y < 9; $y++) {
 
                 // Check for empty cells
-                if ($grid->isEmpty($x, $y)) {
+                if (!$grid->isEmpty($x, $y)) {
+                    continue;
+                }
 
-                    // Loop through possible values
-                    for ($try = 1; $try <= 9; $try++) {
+                // Loop through possible values
+                for ($try = 1; $try <= 9; $try++) {
 
-                        // If valid move (i.e. no collision)
-                        if ($this->cellChecker->isValidMove($grid, $x, $y, $try)) {
-
-                            // Set value
-                            $grid->setValue($x, $y, $try);
-
-                            // Recursively solve
-                            if ($this->solve($grid)) {
-                                // Yay, solved!
-                                return true;
-                            }
-
-                            // Must have failed, backtrack for this cell and try next
-                            $grid->nullValue($x, $y);
-                        }
+                    // If valid move (i.e. no collision)
+                    if (!$this->cellChecker->isValidMove($grid, $x, $y, $try)) {
+                        continue;
                     }
 
-                    // This didn't work, try another route
-                    return false;
+                    // Set value
+                    $grid->setValue($x, $y, $try);
+
+                    // Recursively solve
+                    if ($this->solve($grid)) {
+                        // Yay, solved!
+                        return true;
+                    }
+
+                    // Must have failed, backtrack for this cell and try next
+                    $grid->nullValue($x, $y);
+
                 }
+
+                // This didn't work, try another route
+                return false;
             }
         }
 

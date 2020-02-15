@@ -49,19 +49,6 @@ class Grid
     }
 
     /**
-     * Check we haven't been given junk grid ref
-     *
-     * @param int $x
-     * @param int $y
-     */
-    protected function validateSquareExists(int $x, int $y)
-    {
-        if (!array_key_exists($x, $this->grid) || !array_key_exists($y, $this->grid[$x])) {
-            throw new \OutOfBoundsException("Grid reference not allowed ($x, $y)");
-        }
-    }
-
-    /**
      * Undo a move
      *
      * @param int $x
@@ -82,7 +69,6 @@ class Grid
      */
     public function setValue(int $x, int $y, int $value)
     {
-        $this->validateSquareExists($x, $y);
         $this->moves++;
         $this->grid[$x][$y] = $value;
     }
@@ -108,7 +94,6 @@ class Grid
      */
     public function getValue(int $x, int $y): ?int
     {
-        $this->validateSquareExists($x, $y);
         return $this->grid[$x][$y];
     }
 

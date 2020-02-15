@@ -30,6 +30,50 @@ class CellChecker
     }
 
     /**
+     * Get cells affected by our last move (to check if we have any new obvious moves)
+     *
+     * These are keyed with the x:y to help us avoid checking the same cell twice later
+     *
+     * @param int $x
+     * @param int $y
+     * @return array
+     */
+    public function getAffectedCells(int $x, int $y): array
+    {
+        $cells = [];
+
+        // Whole X Row and Y row
+        for ($i = 0; $i < 9; $i++) {
+            $cells[$i.":".$y] = [
+              'x' => $i,
+              'y' => $y
+            ];
+            $cells[$x.":".$i] = [
+                'x' => $x,
+                'y' => $i
+            ];
+        }
+
+        // Check for same value in segment
+        $segmentXMin = $x - ($x%3);
+        $segmentXMax = $segmentXMin + 2;
+
+        $segmentYMin = $y - ($y%3);
+        $segmentYMax = $segmentYMin + 2;
+
+        for ($i = $segmentXMin; $i <= $segmentXMax; $i++) {
+            for ($n = $segmentYMin; $n <= $segmentYMax; $n++) {
+                $cells[$i.":".$n] = [
+                    'x' => $i,
+                    'y' => $n
+                ];
+            }
+        }
+
+        return $cells;
+    }
+
+    /**
      * @param Grid $grid
      * @param int $x
      * @param int $y

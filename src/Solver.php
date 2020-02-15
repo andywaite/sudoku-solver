@@ -23,15 +23,47 @@ class Solver
     /**
      * Look for a place where only one value will work
      *
-     * @param $grid
+     * @param Grid $grid
+     * @param int|null $lastX
+     * @param int|null $lastY
      * @return array|null
      */
-    protected function getObviousMove($grid): ?array
+    protected function getObviousMove(Grid $grid, ?int $lastX = null, ?int $lastY = null): ?array
     {
-        // Loop cols
+        $affectedCells = [];
+
+        // Try searching around the last move to save time
+        if (!empty($lastX) && !empty($lastY)) {
+            $affectedCells = $this->cellChecker->getAffectedCells($lastX, $lastY);
+
+            foreach ($affectedCells as $affectedCell) {
+                if ($grid->isEmpty($affectedCell['x'], $affectedCell['y'])) {
+                    $moves = $this->cellChecker->getValidMoves($grid, $affectedCell['x'], $affectedCell['y']);
+
+                    // Only one valid move - let's make it!
+                    if (count($moves) === 1) {
+                        return [
+                            'x' => $affectedCell['x'],
+                            'y' => $affectedCell['y'],
+                            'value' => $moves[0]
+                        ];
+                    }
+                }
+            }
+        }
+
+        // OK, maybe we need to look further afield
+
+        // Loop all cols
         for ($x = 0; $x < 9; $x++) {
-            // Loop rows
+            // Loop all rows
             for ($y = 0; $y < 9; $y++) {
+
+                // Skip if already checked
+                if (isset($affectedCells[$x.":".$y])) {
+                    continue;
+                }
+
                 if ($grid->isEmpty($x, $y)) {
 
                     $moves = $this->cellChecker->getValidMoves($grid, $x, $y);
@@ -56,19 +88,21 @@ class Solver
      * Attempt to solve a Sudoku puzzle
      *
      * @param Grid $grid
+     * @param int|null $lastX
+     * @param int|null $lastY
      * @return bool
      * @throws \Exception
      */
-    public function solve(Grid $grid): bool
+    public function solve(Grid $grid, ?int $lastX = null, ?int $lastY = null): bool
     {
-        // Before we brute force, try and see if there's a place where there's only one option. This reduces execution on a hard puzzle from ~6s to ~0.8s but possibly makes easy puzzles take slightly longer?
-        if ($move = $this->getObviousMove($grid)) {
+        // Before we brute force, try and see if there's a place where there's only one option. This reduces execution on a hard puzzle from ~6s to ~0.5s but possibly makes easy puzzles take slightly longer?
+        if ($move = $this->getObviousMove($grid, $lastX, $lastY)) {
 
             // If there is a place where only one option works, make it
             $grid->setValue($move['x'], $move['y'], $move['value']);
 
             // Recursively solve
-            $solve = $this->solve($grid);
+            $solve = $this->solve($grid, $move['x'], $move['y']);
 
             // Even though this HAS to be right, a previous brute force move may have been wrong, so we may need to backtrack
             if (!$solve) {
@@ -95,20 +129,15 @@ class Solver
                     continue;
                 }
 
+                $validMoves = $this->cellChecker->getValidMoves($grid, $x, $y);
+
                 // Loop through possible values
-                for ($try = 1; $try <= 9; $try++) {
-
-                    // If invalid move (i.e. collision with other cells)
-                    if (!$this->cellChecker->isValidMove($grid, $x, $y, $try)) {
-                        // Next possible value
-                        continue;
-                    }
-
+                foreach ($validMoves as $try) {
                     // Set value
                     $grid->setValue($x, $y, $try);
 
                     // Recursively solve
-                    if ($this->solve($grid)) {
+                    if ($this->solve($grid, $x, $y)) {
                         // Yay, solved!
                         return true;
                     }

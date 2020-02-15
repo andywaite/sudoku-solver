@@ -2,9 +2,17 @@
 
 namespace Andywaite\Sudoku;
 
+/**
+ * Class GridPrinter
+ * @package Andywaite\Sudoku
+ *
+ * Simple CLI grid printer
+ */
 class GridPrinter
 {
     /**
+     * Dumb way to visualise grid on the CLI
+     *
      * @param Grid $grid
      */
     public function printGrid(Grid $grid)

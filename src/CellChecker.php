@@ -2,8 +2,33 @@
 
 namespace Andywaite\Sudoku;
 
+/**
+ * Class CellChecker
+ * @package Andywaite\Sudoku
+ *
+ * Helper class to perform mass functions across our Grid
+ */
 class CellChecker
 {
+    /**
+     * @param Grid $grid
+     * @param int $x
+     * @param int $y
+     * @return int[]
+     */
+    public function getValidMoves(Grid $grid, int $x, int $y): array
+    {
+        $movesForSquare = [];
+
+        for ($i = 1; $i <= 9; $i++) {
+            if ($this->isValidMove($grid, $x, $y, $i)) {
+                $movesForSquare[] = $i;
+            }
+        }
+
+        return $movesForSquare;
+    }
+
     /**
      * @param Grid $grid
      * @param int $x

@@ -61,7 +61,7 @@ class Solver
      */
     public function solve(Grid $grid): bool
     {
-        // Before we brute force, try and see if there's a place where there's only one option. This reduces execution on a hard puzzle from ~6s to ~0.8s
+        // Before we brute force, try and see if there's a place where there's only one option. This reduces execution on a hard puzzle from ~6s to ~0.8s but possibly makes easy puzzles take slightly longer?
         if ($move = $this->getObviousMove($grid)) {
 
             // If there is a place where only one option works, make it
@@ -89,16 +89,18 @@ class Solver
             // Loop rows
             for ($y = 0; $y < 9; $y++) {
 
-                // Check for empty cells
+                // Check if this is empty cell
                 if (!$grid->isEmpty($x, $y)) {
+                    // Next cell
                     continue;
                 }
 
                 // Loop through possible values
                 for ($try = 1; $try <= 9; $try++) {
 
-                    // If valid move (i.e. no collision)
+                    // If invalid move (i.e. collision with other cells)
                     if (!$this->cellChecker->isValidMove($grid, $x, $y, $try)) {
+                        // Next possible value
                         continue;
                     }
 

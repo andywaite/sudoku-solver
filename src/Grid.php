@@ -66,7 +66,7 @@ class Grid
      */
     public function isEmpty(int $x, int $y): bool
     {
-        return $this->getValue($x, $y) === null;
+        return $this->grid[$x][$y] === null;
     }
 
     /**

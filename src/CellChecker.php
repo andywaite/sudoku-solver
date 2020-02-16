@@ -76,17 +76,32 @@ class CellChecker
      * @param int $y
      * @return int[]
      */
-    public function getValidMoves(Grid $grid, int $x, int $y): array
+    public function getCandidates(Grid $grid, int $x, int $y): array
     {
-        $movesForSquare = [];
+        $candidates = [
+            1 => 1,
+            2 => 2,
+            3 => 3,
+            4 => 4,
+            5 => 5,
+            6 => 6,
+            7 => 7,
+            8 => 8,
+            9 => 9
+        ];
 
-        for ($i = 1; $i <= 9; $i++) {
-            if ($this->isValidMove($grid, $x, $y, $i)) {
-                $movesForSquare[] = $i;
+        foreach ($this->peers[$x][$y] as $peer) {
+            if ($grid->isEmpty($peer['x'], $peer['y'])) {
+                continue;
+            }
+
+            $existingValue = $grid->getValue($peer['x'], $peer['y']);
+            if (isset($candidates[$existingValue])) {
+                unset($candidates[$existingValue]);
             }
         }
 
-        return $movesForSquare;
+        return array_values($candidates);
     }
 
     /**

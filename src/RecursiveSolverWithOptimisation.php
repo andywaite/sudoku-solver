@@ -44,20 +44,20 @@ class RecursiveSolverWithOptimisation implements Solver
                 }
 
                 // Get moves for this square
-                $moves = $this->cellChecker->getValidMoves($grid, $peer['x'], $peer['y']);
-                $moveCount = count($moves);
+                $candidates = $this->cellChecker->getCandidates($grid, $peer['x'], $peer['y']);
+                $candidateCount = count($candidates);
 
                 // Oops, dead end situation - no point carrying on
-                if ($moveCount === 0) {
+                if ($candidateCount === 0) {
                     return null;
                 }
 
-                // Only one valid move - let's make it!
-                if ($moveCount === 1) {
+                // Only one valid candidate - let's make a move!
+                if ($candidateCount === 1) {
                     $obviousMoves[] = [
                         'x' => $peer['x'],
                         'y' => $peer['y'],
-                        'value' => $moves[0]
+                        'value' => $candidates[0]
                     ];
                 }
             }
@@ -73,30 +73,29 @@ class RecursiveSolverWithOptimisation implements Solver
         // Loop empty cells
         $empty = $grid->getEmptyCells();
 
-        foreach ($empty as $cell)
-        {
+        foreach ($empty as $cell) {
             $x = $cell['x'];
             $y = $cell['y'];
 
             // Skip if already checked
-            if (isset($peers[$x.$y])) {
+            if (isset($peers[$x . $y])) {
                 continue;
             }
 
-            $moves = $this->cellChecker->getValidMoves($grid, $x, $y);
-            $moveCount = count($moves);
+            $candidates = $this->cellChecker->getCandidates($grid, $x, $y);
+            $candidateCount = count($candidates);
 
             // Oops, dead end situation - no point carrying on
-            if ($moveCount === 0) {
+            if ($candidateCount === 0) {
                 return null;
             }
 
-            // Only one valid move - let's make it!
-            if ($moveCount === 1) {
-                $obviousMoves[] =  [
+            // Only one valid candidate - let's make a move!
+            if ($candidateCount === 1) {
+                $obviousMoves[] = [
                     'x' => $x,
                     'y' => $y,
-                    'value' => $moves[0]
+                    'value' => $candidates[0]
                 ];
             }
         }
@@ -127,27 +126,27 @@ class RecursiveSolverWithOptimisation implements Solver
     public function recursiveSolve(Grid $grid, ?int $lastX = null, ?int $lastY = null): bool
     {
         // METHOD 1 - fill in any cells where there's only one option
-        $moves = $this->getObviousMoves($grid, $lastX, $lastY);
+        $candidates = $this->getObviousMoves($grid, $lastX, $lastY);
 
         // getObviousMoves returns null if there is ANY square where nothing fits - helps avoid spending any more time in dead ends
-        if ($moves === null) {
+        if ($candidates === null) {
             return false;
         }
 
         // If we have any obvious moves, let's make them!
-        if (count($moves)) {
+        if (count($candidates)) {
 
-            $movesSoFar = [];
+            $candidatesSoFar = [];
 
             // For any places where only one option works, make it
-            foreach ($moves as $move) {
-                if ($this->cellChecker->isValidMove($grid, $move['x'], $move['y'], $move['value'])) {
-                    $grid->setValue($move['x'], $move['y'], $move['value']);
-                    $movesSoFar[] = $move;
+            foreach ($candidates as $candidate) {
+                if ($this->cellChecker->isValidMove($grid, $candidate['x'], $candidate['y'], $candidate['value'])) {
+                    $grid->setValue($candidate['x'], $candidate['y'], $candidate['value']);
+                    $candidatesSoFar[] = $candidate;
                 } else {
                     // Collision of obvious moves, must have taken a wrong turn earlier on so undo everything
-                    foreach ($movesSoFar as $moveSoFar) {
-                        $grid->nullValue($moveSoFar['x'], $moveSoFar['y']);
+                    foreach ($candidatesSoFar as $candidateSoFar) {
+                        $grid->nullValue($candidateSoFar['x'], $candidateSoFar['y']);
                     }
                     // Backtrack
                     return false;
@@ -160,8 +159,8 @@ class RecursiveSolverWithOptimisation implements Solver
             // Even though this HAS to be right, a previous brute force move may have been wrong, so we may need to backtrack
             if (!$solve) {
                 // Undo all moves and pass up the chain we were wrong :(
-                foreach ($moves as $move) {
-                    $grid->nullValue($move['x'], $move['y']);
+                foreach ($candidates as $candidate) {
+                    $grid->nullValue($candidate['x'], $candidate['y']);
                 }
                 // Backtrack
                 return false;
@@ -179,22 +178,23 @@ class RecursiveSolverWithOptimisation implements Solver
 
         // Find out what valid moves we have for each empty cell
         foreach ($emptyCells as $id => $emptyCell) {
-            $potentialMoves = $this->cellChecker->getValidMoves($grid, $emptyCell['x'], $emptyCell['y']);
-            $moveCount = count($potentialMoves);
+            $candidates = $this->cellChecker->getCandidates($grid, $emptyCell['x'], $emptyCell['y']);
+            $candidateCount = count($candidates);
 
             // If there's any cell we can't do anything with, we hit a dead end clearly
-            if ($moveCount == 0) {
+            if ($candidateCount == 0) {
                 return false;
             }
 
             // We're looking for a move with fewest possible options - speeds things up
-            if ($moveCount < $optimalCell['moveCount']) {
+            if ($candidateCount < $optimalCell['moveCount']) {
                 $optimalCell = $emptyCell;
-                $optimalCell['moveCount'] = $moveCount;
-                $optimalCell['moves'] = $potentialMoves;
+                $optimalCell['moveCount'] = $candidateCount;
+                $optimalCell['moves'] = $candidates;
             }
         }
 
+        // If there is a move to be made, let's make it!
         if (isset($optimalCell['moves'])) {
             $x = $optimalCell['x'];
             $y = $optimalCell['y'];

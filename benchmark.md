@@ -1,7 +1,7 @@
 # Benchmarks for solvers
 | |Basic Recursive|Optimised Recursive|
 |---|---|---|
-|examples/hard.txt|0.002440|0.004377|
-|examples/harder.txt|0.228233|0.032849|
-|examples/hardest.txt|21.484499|6.790423|
-|examples/evenharder.txt|48.800739|16.021024|
+|examples/hard.txt|0.003253|0.002244|
+|examples/harder.txt|0.215900|0.011521|
+|examples/hardest.txt|19.133933|2.092510|
+|examples/evenharder.txt|43.674204|4.944258|

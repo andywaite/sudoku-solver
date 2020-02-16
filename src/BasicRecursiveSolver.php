@@ -56,7 +56,7 @@ class BasicRecursiveSolver implements Solver
                    $grid->nullValue($x, $y);
                }
 
-               // Nothing works in this cell, backtrack
+               // Nothing works in this cell, backtrack up a level
                return false;
            }
        }

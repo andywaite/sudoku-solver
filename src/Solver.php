@@ -151,8 +151,15 @@ class Solver
             $x = $emptyCell['x'];
             $y = $emptyCell['y'];
             $potentialMoves = $this->cellChecker->getValidMoves($grid, $x, $y);
+            $moveCount = count($potentialMoves);
+
+            // If there's somewhere we can't go, we hit a dead end clearly
+            if ($moveCount == 0) {
+                return false;
+            }
+
             $emptyCell['moves'] = $potentialMoves;
-            $sortedCells[count($potentialMoves).$x.$y] = $emptyCell;
+            $sortedCells[$moveCount.$x.$y] = $emptyCell;
         }
 
         // We want to try the cell with the fewest options first, so sort. Expensive op, but pays for itself on complex puzzles

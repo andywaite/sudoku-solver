@@ -92,7 +92,6 @@ class Solver
         return $obviousMoves;
     }
 
-
     /**
      * Attempt to solve a Sudoku puzzle
      *
@@ -104,7 +103,7 @@ class Solver
      */
     public function solve(Grid $grid, ?int $lastX = null, ?int $lastY = null): bool
     {
-        // Before we brute force, try and see if there's any places where there's only one option. This reduces execution time.
+        // METHOD 1 - fill in any cells where there's only one option
         $moves = $this->getObviousMoves($grid, $lastX, $lastY);
 
         if (count($moves)) {
@@ -142,7 +141,7 @@ class Solver
             return true;
         }
 
-        // Now brute force
+        // METHOD 2 - brute force by trying something that could fit
         $emptyCells = $grid->getEmptyCells();
         $sortedCells = [];
 

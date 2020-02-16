@@ -28,7 +28,7 @@ class Solver
      * @param int|null $lastY
      * @return array
      */
-    protected function getObviousMoves(Grid $grid, ?int $lastX = null, ?int $lastY = null): array
+    protected function getObviousMoves(Grid $grid, ?int $lastX = null, ?int $lastY = null): ?array
     {
         $affectedCells = [];
         $obviousMoves = [];
@@ -45,9 +45,15 @@ class Solver
 
                 // Get moves for this square
                 $moves = $this->cellChecker->getValidMoves($grid, $affectedCell['x'], $affectedCell['y']);
+                $moveCount = count($moves);
+
+                // Oops, dead end situation - no point carrying on
+                if ($moveCount === 0) {
+                    return null;
+                }
 
                 // Only one valid move - let's make it!
-                if (count($moves) === 1) {
+                if ($moveCount === 1) {
                     $obviousMoves[] = [
                         'x' => $affectedCell['x'],
                         'y' => $affectedCell['y'],
@@ -78,9 +84,15 @@ class Solver
             }
 
             $moves = $this->cellChecker->getValidMoves($grid, $x, $y);
+            $moveCount = count($moves);
+
+            // Oops, dead end situation - no point carrying on
+            if ($moveCount === 0) {
+                return null;
+            }
 
             // Only one valid move - let's make it!
-            if (count($moves) === 1) {
+            if ($moveCount === 1) {
                 $obviousMoves[] =  [
                     'x' => $x,
                     'y' => $y,
@@ -106,6 +118,12 @@ class Solver
         // METHOD 1 - fill in any cells where there's only one option
         $moves = $this->getObviousMoves($grid, $lastX, $lastY);
 
+        // getObviousMoves returns null if there is ANY square where nothing fits - helps avoid spending any more time in dead ends
+        if ($moves === null) {
+            return false;
+        }
+
+        // If we have any obvious moves, let's make them!
         if (count($moves)) {
 
             $movesSoFar = [];
@@ -144,6 +162,7 @@ class Solver
 
         // METHOD 2 - brute force by trying something that could fit
         $emptyCells = $grid->getEmptyCells();
+
         $sortedCells = [];
 
         // Find out what valid moves we have for each empty cell
@@ -153,7 +172,7 @@ class Solver
             $potentialMoves = $this->cellChecker->getValidMoves($grid, $x, $y);
             $moveCount = count($potentialMoves);
 
-            // If there's somewhere we can't go, we hit a dead end clearly
+            // If there's any cell we can't go, we hit a dead end clearly
             if ($moveCount == 0) {
                 return false;
             }
@@ -193,7 +212,7 @@ class Solver
             return false;
         }
 
-        // We won!
+        // We won - nowhere left to go!
         return true;
     }
 }

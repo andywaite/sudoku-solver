@@ -116,11 +116,11 @@ class Solver
                     $grid->setValue($move['x'], $move['y'], $move['value']);
                     $movesSoFar[] = $move;
                 } else {
-                    // Collision of obvious moves, must have taken a wrong turn earlier on
+                    // Collision of obvious moves, must have taken a wrong turn earlier on so undo everything
                     foreach ($movesSoFar as $moveSoFar) {
                         $grid->nullValue($moveSoFar['x'], $moveSoFar['y']);
                     }
-                    // Dead end
+                    // Backtrack
                     return false;
                 }
             }
@@ -134,6 +134,7 @@ class Solver
                 foreach ($moves as $move) {
                     $grid->nullValue($move['x'], $move['y']);
                 }
+                // Backtrack
                 return false;
             }
 
@@ -176,15 +177,16 @@ class Solver
                     return true;
                 }
 
-
                 // Must have failed, backtrack for this cell and try next
                 $grid->nullValue($x, $y);
 
             }
 
+            // Backtrack
             return false;
         }
 
+        // We won!
         return true;
     }
 }

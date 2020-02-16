@@ -143,15 +143,28 @@ class Solver
         }
 
         // Now brute force
-        $empty = $grid->getEmptyCells();
+        $emptyCells = $grid->getEmptyCells();
+        $sortedCells = [];
+
+        // Find out what valid moves we have for each empty cell
+        foreach ($emptyCells as $id => $emptyCell) {
+            $x = $emptyCell['x'];
+            $y = $emptyCell['y'];
+            $potentialMoves = $this->cellChecker->getValidMoves($grid, $x, $y);
+            $emptyCell['moves'] = $potentialMoves;
+            $sortedCells[count($potentialMoves).$x.$y] = $emptyCell;
+        }
+
+        // We want to try the cell with the fewest options first, so sort. Expensive op, but pays for itself on complex puzzles
+        ksort($sortedCells);
 
         // Loop cols
-        foreach ($empty as $cell) {
+        foreach ($sortedCells as $cell) {
 
             $x = $cell['x'];
             $y = $cell['y'];
 
-            $validMoves = $this->cellChecker->getValidMoves($grid, $x, $y);
+            $validMoves = $cell['moves'];
 
             // Loop through possible values
             foreach ($validMoves as $try) {

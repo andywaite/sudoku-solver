@@ -32,15 +32,19 @@ class CellChecker
                 // Whole X Row and Y row
                 for ($i = 0; $i < 9; $i++) {
 
-                    $cells[$i . ":" . $y] = [
-                        'x' => $i,
-                        'y' => $y
-                    ];
+                    if ($i != $x) {
+                        $cells[$i . ":" . $y] = [
+                            'x' => $i,
+                            'y' => $y
+                        ];
+                    }
 
-                    $cells[$x . ":" . $i] = [
-                        'x' => $x,
-                        'y' => $i
-                    ];
+                    if ($i != $y) {
+                        $cells[$x . ":" . $i] = [
+                            'x' => $x,
+                            'y' => $i
+                        ];
+                    }
                 }
 
                 // Check for same value in segment
@@ -52,10 +56,12 @@ class CellChecker
 
                 for ($i = $segmentXMin; $i <= $segmentXMax; $i++) {
                     for ($n = $segmentYMin; $n <= $segmentYMax; $n++) {
-                        $cells[$i . ":" . $n] = [
-                            'x' => $i,
-                            'y' => $n
-                        ];
+                        if ($x != $i && $y != $n) {
+                            $cells[$i . ":" . $n] = [
+                                'x' => $i,
+                                'y' => $n
+                            ];
+                        }
                     }
                 }
 

@@ -109,9 +109,21 @@ class Solver
 
         if (count($moves)) {
 
+            $movesSoFar = [];
+
             // For any places where only one option works, make it
             foreach ($moves as $move) {
-                $grid->setValue($move['x'], $move['y'], $move['value']);
+                if ($this->cellChecker->isValidMove($grid, $move['x'], $move['y'], $move['value'])) {
+                    $grid->setValue($move['x'], $move['y'], $move['value']);
+                    $movesSoFar[] = $move;
+                } else {
+                    // Collision of obvious moves, must have taken a wrong turn earlier on
+                    foreach ($movesSoFar as $moveSoFar) {
+                        $grid->nullValue($moveSoFar['x'], $moveSoFar['y']);
+                    }
+                    // Dead end
+                    return false;
+                }
             }
 
             // Recursively solve

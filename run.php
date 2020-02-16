@@ -19,7 +19,9 @@ $printer->printGrid($grid);
 // Solve!
 $start = microtime(true);
 try {
-    $solver->solve($grid);
+    if (!$solver->solve($grid)) {
+        throw new Exception("Solver returned false");
+    }
     echo "\n\nSolved";
 } catch (Exception $e) {
     echo "\n\nFailed to solve: ".$e->getMessage();

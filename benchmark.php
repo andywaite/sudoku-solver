@@ -43,7 +43,7 @@ foreach ($examples as $example) {
     }
 }
 
-$benchmarkOutput = "#Benchmarks for solvers";
+$benchmarkOutput = "# Benchmarks for solvers";
 $benchmarkOutput .= "\n| |";
 $blankLine = "\n|---|";
 

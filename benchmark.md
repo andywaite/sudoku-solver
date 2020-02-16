@@ -1,4 +1,4 @@
-#Benchmarks for solvers
+# Benchmarks for solvers
 | |Basic Recursive|Optimised Recursive|
 |---|---|---|
 |examples/hard.txt|0.005841|0.006439|

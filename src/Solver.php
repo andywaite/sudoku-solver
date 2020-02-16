@@ -57,6 +57,11 @@ class Solver
             }
         }
 
+        // If we have some moves, make them!
+        if (count($obviousMoves) > 0) {
+            return $obviousMoves;
+        }
+
         // OK, maybe we need to look further afield
 
         // Loop empty cells

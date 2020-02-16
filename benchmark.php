@@ -5,7 +5,8 @@ include 'vendor/autoload.php';
 $examples = [
     'examples/hard.txt',
     'examples/harder.txt',
-    'examples/hardest.txt'
+    'examples/hardest.txt',
+    'examples/evenharder.txt'
 ];
 
 // Create our classes

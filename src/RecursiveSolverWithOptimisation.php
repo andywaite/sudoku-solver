@@ -30,21 +30,21 @@ class RecursiveSolverWithOptimisation implements Solver
      */
     protected function getObviousMoves(Grid $grid, ?int $lastX = null, ?int $lastY = null): ?array
     {
-        $affectedCells = [];
+        $peers = [];
         $obviousMoves = [];
 
         // Try searching around the last move to save time
         if (!empty($lastX) && !empty($lastY)) {
-            $affectedCells = $this->cellChecker->getAffectedCells($lastX, $lastY);
+            $peers = $this->cellChecker->getPeers($lastX, $lastY);
 
-            foreach ($affectedCells as $affectedCell) {
+            foreach ($peers as $peer) {
                 // If it's not empty ignore it
-                if (!$grid->isEmpty($affectedCell['x'], $affectedCell['y'])) {
+                if (!$grid->isEmpty($peer['x'], $peer['y'])) {
                     continue;
                 }
 
                 // Get moves for this square
-                $moves = $this->cellChecker->getValidMoves($grid, $affectedCell['x'], $affectedCell['y']);
+                $moves = $this->cellChecker->getValidMoves($grid, $peer['x'], $peer['y']);
                 $moveCount = count($moves);
 
                 // Oops, dead end situation - no point carrying on
@@ -55,8 +55,8 @@ class RecursiveSolverWithOptimisation implements Solver
                 // Only one valid move - let's make it!
                 if ($moveCount === 1) {
                     $obviousMoves[] = [
-                        'x' => $affectedCell['x'],
-                        'y' => $affectedCell['y'],
+                        'x' => $peer['x'],
+                        'y' => $peer['y'],
                         'value' => $moves[0]
                     ];
                 }
@@ -79,7 +79,7 @@ class RecursiveSolverWithOptimisation implements Solver
             $y = $cell['y'];
 
             // Skip if already checked
-            if (isset($affectedCells[$x.$y])) {
+            if (isset($peers[$x.$y])) {
                 continue;
             }
 

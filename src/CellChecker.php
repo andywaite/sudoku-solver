@@ -13,17 +13,17 @@ class CellChecker
     /**
      * @var array
      */
-    protected $linkedCells = [];
+    protected $peers = [];
 
     public function __construct()
     {
-        $this->setupLinkedCells();
+        $this->setupPeers();
     }
 
     /**
      * Maintains a list of all linked cells so that when we make 1 move, we can quickly see if that makes other moves possible
      */
-    protected function setupLinkedCells()
+    protected function setupPeers()
     {
         for ($x = 0; $x < 9; $x++) {
             for ($y = 0; $y < 9; $y++) {
@@ -65,7 +65,7 @@ class CellChecker
                     }
                 }
 
-                $this->linkedCells[$x][$y] = $cells;
+                $this->peers[$x][$y] = $cells;
             }
         }
     }
@@ -98,9 +98,9 @@ class CellChecker
      * @param int $y
      * @return array
      */
-    public function getAffectedCells(int $x, int $y): array
+    public function getPeers(int $x, int $y): array
     {
-        return $this->linkedCells[$x][$y];
+        return $this->peers[$x][$y];
     }
 
     /**
@@ -112,7 +112,7 @@ class CellChecker
      */
     public function isValidMove(Grid $grid, int $x, int $y, $value): bool
     {
-        foreach ($this->linkedCells[$x][$y] as $linkedCell) {
+        foreach ($this->peers[$x][$y] as $linkedCell) {
             if ($grid->getValue($linkedCell['x'], $linkedCell['y']) == $value) {
                 return false;
             }

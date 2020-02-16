@@ -15,7 +15,7 @@ class Grid
      *
      * @var array
      */
-    protected $grid;
+    protected $grid = [];
 
     /**
      * Count of moves we've made - for debug / optimisation
@@ -83,6 +83,29 @@ class Grid
     public function isEmpty(int $x, int $y): bool
     {
         return $this->getValue($x, $y) === null;
+    }
+
+    /**
+     * Get empty cells in this grid
+     *
+     * @return array
+     */
+    public function getEmptyCells(): array
+    {
+        $cells = [];
+
+        foreach ($this->grid as $x => $col) {
+            foreach ($col as $y => $value) {
+                if ($value === null) {
+                    $cells[$x.$y] = [
+                        'x' => $x,
+                        'y' => $y
+                    ];
+                }
+            }
+        }
+
+        return $cells;
     }
 
     /**

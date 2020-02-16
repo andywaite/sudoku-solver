@@ -11,6 +11,60 @@ namespace Andywaite\Sudoku;
 class CellChecker
 {
     /**
+     * @var array
+     */
+    protected $linkedCells = [];
+
+    public function __construct()
+    {
+        $this->setupLinkedCells();
+    }
+
+    /**
+     * Maintains a list of all linked cells so that when we make 1 move, we can quickly see if that makes other moves possible
+     */
+    protected function setupLinkedCells()
+    {
+        for ($x = 0; $x < 9; $x++) {
+            for ($y = 0; $y < 9; $y++) {
+                $cells = [];
+
+                // Whole X Row and Y row
+                for ($i = 0; $i < 9; $i++) {
+
+                    $cells[$i . ":" . $y] = [
+                        'x' => $i,
+                        'y' => $y
+                    ];
+
+                    $cells[$x . ":" . $i] = [
+                        'x' => $x,
+                        'y' => $i
+                    ];
+                }
+
+                // Check for same value in segment
+                $segmentXMin = $x - ($x%3);
+                $segmentXMax = $segmentXMin + 2;
+
+                $segmentYMin = $y - ($y%3);
+                $segmentYMax = $segmentYMin + 2;
+
+                for ($i = $segmentXMin; $i <= $segmentXMax; $i++) {
+                    for ($n = $segmentYMin; $n <= $segmentYMax; $n++) {
+                        $cells[$i . ":" . $n] = [
+                            'x' => $i,
+                            'y' => $n
+                        ];
+                    }
+                }
+
+                $this->linkedCells[$x][$y] = $cells;
+            }
+        }
+    }
+
+    /**
      * @param Grid $grid
      * @param int $x
      * @param int $y
@@ -40,37 +94,7 @@ class CellChecker
      */
     public function getAffectedCells(int $x, int $y): array
     {
-        $cells = [];
-
-        // Whole X Row and Y row
-        for ($i = 0; $i < 9; $i++) {
-            $cells[$i.":".$y] = [
-              'x' => $i,
-              'y' => $y
-            ];
-            $cells[$x.":".$i] = [
-                'x' => $x,
-                'y' => $i
-            ];
-        }
-
-        // Check for same value in segment
-        $segmentXMin = $x - ($x%3);
-        $segmentXMax = $segmentXMin + 2;
-
-        $segmentYMin = $y - ($y%3);
-        $segmentYMax = $segmentYMin + 2;
-
-        for ($i = $segmentXMin; $i <= $segmentXMax; $i++) {
-            for ($n = $segmentYMin; $n <= $segmentYMax; $n++) {
-                $cells[$i.":".$n] = [
-                    'x' => $i,
-                    'y' => $n
-                ];
-            }
-        }
-
-        return $cells;
+        return $this->linkedCells[$x][$y];
     }
 
     /**

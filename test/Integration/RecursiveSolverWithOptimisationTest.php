@@ -2,12 +2,11 @@
 
 use Andywaite\Sudoku\CellChecker;
 use Andywaite\Sudoku\GridLoader;
-use Andywaite\Sudoku\GridPrinter;
-use Andywaite\Sudoku\Solver;
+use Andywaite\Sudoku\RecursiveSolverWithOptimisation;
 use \PHPUnit\Framework\TestCase;
 use Andywaite\Sudoku\Grid;
 
-class SolverTest extends TestCase
+class RecursiveSolverWithOptimisationTest extends TestCase
 {
     /**
      * @dataProvider solverDataProvider
@@ -16,7 +15,7 @@ class SolverTest extends TestCase
     {
         $puzzleGrid = new Grid();
         $solutionGrid = new Grid();
-        $solver = new Solver(new CellChecker());
+        $solver = new RecursiveSolverWithOptimisation(new CellChecker());
         $gridLoader = new GridLoader();
 
         $gridLoader->loadGrid($puzzleGrid, $puzzleFilename);

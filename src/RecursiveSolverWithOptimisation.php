@@ -173,35 +173,33 @@ class RecursiveSolverWithOptimisation implements Solver
 
         // METHOD 2 - brute force by trying something that could fit
         $emptyCells = $grid->getEmptyCells();
-
-        $sortedCells = [];
+        $optimalCell = [
+            'moveCount' => 10
+        ];
 
         // Find out what valid moves we have for each empty cell
         foreach ($emptyCells as $id => $emptyCell) {
-            $x = $emptyCell['x'];
-            $y = $emptyCell['y'];
-            $potentialMoves = $this->cellChecker->getValidMoves($grid, $x, $y);
+            $potentialMoves = $this->cellChecker->getValidMoves($grid, $emptyCell['x'], $emptyCell['y']);
             $moveCount = count($potentialMoves);
 
-            // If there's any cell we can't go, we hit a dead end clearly
+            // If there's any cell we can't do anything with, we hit a dead end clearly
             if ($moveCount == 0) {
                 return false;
             }
 
-            $emptyCell['moves'] = $potentialMoves;
-            $sortedCells[$moveCount.$x.$y] = $emptyCell;
+            // We're looking for a move with fewest possible options - speeds things up
+            if ($moveCount < $optimalCell['moveCount']) {
+                $optimalCell = $emptyCell;
+                $optimalCell['moveCount'] = $moveCount;
+                $optimalCell['moves'] = $potentialMoves;
+            }
         }
 
-        // We want to try the cell with the fewest options first, so sort. Expensive op, but pays for itself on complex puzzles
-        ksort($sortedCells);
+        if (isset($optimalCell['moves'])) {
+            $x = $optimalCell['x'];
+            $y = $optimalCell['y'];
 
-        // Loop cols
-        foreach ($sortedCells as $cell) {
-
-            $x = $cell['x'];
-            $y = $cell['y'];
-
-            $validMoves = $cell['moves'];
+            $validMoves = $optimalCell['moves'];
 
             // Loop through possible values
             foreach ($validMoves as $try) {
@@ -216,14 +214,12 @@ class RecursiveSolverWithOptimisation implements Solver
 
                 // Must have failed, backtrack for this cell and try next
                 $grid->nullValue($x, $y);
-
             }
-
-            // Backtrack
+            // Must be in a bad branch, need to backtrack :(
             return false;
         }
 
-        // We won - nowhere left to go!
+        // Winner winner chicken dinner - nothing left to complete so we must be finished!
         return true;
     }
 }

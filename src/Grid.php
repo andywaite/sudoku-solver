@@ -17,20 +17,6 @@ class Grid
      */
     protected $grid = [];
 
-    /**
-     * Count of moves we've made - for debug / optimisation
-     *
-     * @var int
-     */
-    protected $moves = 0;
-
-    /**
-     * Count of backtracks we've made - for debug / optimisation
-     *
-     * @var int
-     */
-    protected $undos = 0;
-
     public function __construct()
     {
         $this->generateGrid();
@@ -56,7 +42,6 @@ class Grid
      */
     public function nullValue(int $x, int $y)
     {
-        $this->undos++;
         $this->grid[$x][$y] = null;
     }
 
@@ -69,7 +54,6 @@ class Grid
      */
     public function setValue(int $x, int $y, int $value)
     {
-        $this->moves++;
         $this->grid[$x][$y] = $value;
     }
 
@@ -118,25 +102,5 @@ class Grid
     public function getValue(int $x, int $y): ?int
     {
         return $this->grid[$x][$y];
-    }
-
-    /**
-     * Count of moves we've made - for debug / optimisation
-     *
-     * @return int
-     */
-    public function getMoves(): int
-    {
-        return $this->moves;
-    }
-
-    /**
-     * Count of backtracks we've made - for debug / optimisation
-     *
-     * @return int
-     */
-    public function getUndos(): int
-    {
-        return $this->undos;
     }
 }

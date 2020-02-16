@@ -34,7 +34,5 @@ $runTime = ($end - $start);
 // Show the completed grid
 $printer->printGrid($grid);
 
-// Show some stats
-echo "\nMoves: ".$grid->getMoves();
-echo "\nFailed paths: ".$grid->getUndos();
+// Show exec time
 echo "\nExecution: ".$runTime."\n";

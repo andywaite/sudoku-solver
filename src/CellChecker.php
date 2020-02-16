@@ -113,6 +113,8 @@ class CellChecker
     public function isValidMove(Grid $grid, int $x, int $y, $value): bool
     {
         foreach ($this->peers[$x][$y] as $linkedCell) {
+
+            // We can't have the same value as one of our peers
             if ($grid->getValue($linkedCell['x'], $linkedCell['y']) == $value) {
                 return false;
             }

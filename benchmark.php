@@ -16,7 +16,8 @@ $cellChecker = new \Andywaite\Sudoku\CellChecker();
 
 $solvers = [
     "Basic Recursive" => new \Andywaite\Sudoku\BasicRecursiveSolver($cellChecker),
-    "Optimised Recursive" => new \Andywaite\Sudoku\RecursiveSolverWithOptimisation($cellChecker)
+    "Optimised Recursive" => new \Andywaite\Sudoku\RecursiveSolverWithOptimisation($cellChecker),
+    "Hacky But Fast" => new \Andywaite\Sudoku\HackyButFast()
 ];
 
 $results = [];

@@ -6,7 +6,7 @@ include 'vendor/autoload.php';
 // Create our classes
 $grid = new \Andywaite\Sudoku\Grid();
 $printer = new \Andywaite\Sudoku\GridPrinter();
-$solver = new \Andywaite\Sudoku\RecursiveSolverWithOptimisation(new \Andywaite\Sudoku\CellChecker());
+$solver = new \Andywaite\Sudoku\HackyButFast();
 $gridLoader = new \Andywaite\Sudoku\GridLoader();
 
 // Load start grid from file

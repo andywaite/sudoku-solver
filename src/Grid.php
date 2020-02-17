@@ -23,6 +23,22 @@ class Grid
     }
 
     /**
+     * @return array
+     */
+    public function getRawGrid(): array
+    {
+        return $this->grid;
+    }
+
+    /**
+     * @param array $grid
+     */
+    public function setRawGrid(array $grid)
+    {
+        $this->grid = $grid;
+    }
+
+    /**
      * Create an empty grid structure which is 9x9
      */
     protected function generateGrid()

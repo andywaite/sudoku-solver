@@ -40,16 +40,16 @@ class HackyButFast implements Solver
                 for ($i = 0; $i < 9; $i++) {
 
                     if ($i != $x) {
-                        $cells[$i . ":" . $y] = [
-                            'x' => $i,
-                            'y' => $y
+                        $cells[] = [
+                            $i,
+                            $y
                         ];
                     }
 
                     if ($i != $y) {
-                        $cells[$x . ":" . $i] = [
-                            'x' => $x,
-                            'y' => $i
+                        $cells[] = [
+                            $x,
+                            $i
                         ];
                     }
                 }
@@ -64,9 +64,9 @@ class HackyButFast implements Solver
                 for ($i = $segmentXMin; $i <= $segmentXMax; $i++) {
                     for ($n = $segmentYMin; $n <= $segmentYMax; $n++) {
                         if ($x != $i && $y != $n) {
-                            $cells[$i . ":" . $n] = [
-                                'x' => $i,
-                                'y' => $n
+                            $cells[] = [
+                                $i,
+                                $n
                             ];
                         }
                     }
@@ -85,26 +85,15 @@ class HackyButFast implements Solver
     protected function getCandidates(int $x, int $y): array
     {
         $candidates = [
-            1 => 1,
-            2 => 2,
-            3 => 3,
-            4 => 4,
-            5 => 5,
-            6 => 6,
-            7 => 7,
-            8 => 8,
-            9 => 9
+           1, 2, 3, 4, 5, 6, 7, 8, 9
         ];
 
         foreach ($this->peers[$x][$y] as $peer) {
-            if (!isset($this->grid[$peer['x']][$peer['y']])) {
+            if (!isset($this->grid[$peer[0]][$peer[1]])) {
                 continue;
             }
 
-            $existingValue = $this->grid[$peer['x']][$peer['y']];
-            if (isset($candidates[$existingValue])) {
-                unset($candidates[$existingValue]);
-            }
+            unset($candidates[$this->grid[$peer[0]][$peer[1]]- 1]);
         }
 
         return array_values($candidates);
@@ -135,9 +124,9 @@ class HackyButFast implements Solver
         foreach ($this->grid as $x => $col) {
             foreach ($col as $y => $value) {
                 if ($value === null) {
-                    $cells[$x.$y] = [
-                        'x' => $x,
-                        'y' => $y
+                    $cells[] = [
+                        $x,
+                        $y
                     ];
                 }
             }
@@ -166,28 +155,28 @@ class HackyButFast implements Solver
 
             foreach ($peers as $peer) {
                 // If it's not empty ignore it
-                if (!empty($this->grid[$peer['x']][$peer['y']])) {
+                if (!empty($this->grid[$peer[0]][$peer[1]])) {
                     continue;
                 }
 
                 // Get moves for this square
-                $potentialCandidates = $this->getCandidates($peer['x'], $peer['y']);
+                $potentialCandidates = $this->getCandidates($peer[0], $peer[1]);
                 $candidateCount = count($potentialCandidates);
 
                 // Oops, dead end situation - no point carrying on
                 if ($candidateCount === 0) {
                     foreach ($candidates as $candidateSoFar) {
-                        $this->grid[$candidateSoFar['x']][$candidateSoFar['y']] = null;
+                        $this->grid[$candidateSoFar[0]][$candidateSoFar[1]] = null;
                     }
                     return false;
                 }
 
                 if ($candidateCount === 1) {
-                    $this->grid[$peer['x']][$peer['y']] = $potentialCandidates[0];
+                    $this->grid[$peer[0]][$peer[1]] = $potentialCandidates[0];
 
                     $candidates[] = [
-                        'x' => $peer['x'],
-                        'y' => $peer['y']
+                        0 => $peer[0],
+                        1 => $peer[1]
                     ];
                 }
             }
@@ -200,7 +189,7 @@ class HackyButFast implements Solver
                 if (!$solve) {
                     // Undo all moves and pass up the chain we were wrong :(
                     foreach ($candidates as $candidate) {
-                        $this->grid[$candidate['x']][$candidate['y']] = null;
+                        $this->grid[$candidate[0]][$candidate[1]] = null;
                     }
                     // Backtrack
                     return false;
@@ -221,7 +210,7 @@ class HackyButFast implements Solver
 
         // Find out what valid moves we have for each empty cell
         foreach ($emptyCells as $emptyCell) {
-            $candidates = $this->getCandidates($emptyCell['x'], $emptyCell['y']);
+            $candidates = $this->getCandidates($emptyCell[0], $emptyCell[1]);
             $candidateCount = count($candidates);
 
             // If there's any cell we can't do anything with, we hit a dead end clearly
@@ -233,8 +222,8 @@ class HackyButFast implements Solver
             if ($candidateCount < $optimalCellMoveCount) {
                 $optimalCellMoveCount = $candidateCount;
                 $optimalCandidates = $candidates;
-                $x = $emptyCell['x'];
-                $y = $emptyCell['y'];
+                $x = $emptyCell[0];
+                $y = $emptyCell[1];
 
                 if ($candidateCount == 1) {
                     break;

@@ -158,11 +158,11 @@ class HackyButFast implements Solver
     protected function recursiveSolve(?int $lastX = null, ?int $lastY = null): bool
     {
         // METHOD 1 - fill in any cells where there's only one option
-        $candidates = [];
 
         // Try searching around the last move to save time
         if ($lastX !== null && $lastY !== null) {
             $peers = $this->peers[$lastX][$lastY];
+            $candidates = [];
 
             foreach ($peers as $peer) {
                 // If it's not empty ignore it
@@ -187,13 +187,12 @@ class HackyButFast implements Solver
 
                     $candidates[] = [
                         'x' => $peer['x'],
-                        'y' => $peer['y'],
-                        'value' => $potentialCandidates[0]
+                        'y' => $peer['y']
                     ];
                 }
             }
 
-            if (count($candidates)) {
+            if (isset($candidates[0])) {
                 // Recursively solve
                 $solve = $this->recursiveSolve();
 
@@ -215,25 +214,27 @@ class HackyButFast implements Solver
 
         // METHOD 2 - brute force by trying something that could fit
         $emptyCells = $this->getEmptyCells();
-        $optimalCell = [
-            'moveCount' => 10
-        ];
+        $optimalCellMoveCount = 10;
+        $x = null;
+        $y = null;
+        $optimalCandidates = null;
 
         // Find out what valid moves we have for each empty cell
-        foreach ($emptyCells as $id => $emptyCell) {
+        foreach ($emptyCells as $emptyCell) {
             $candidates = $this->getCandidates($emptyCell['x'], $emptyCell['y']);
             $candidateCount = count($candidates);
 
             // If there's any cell we can't do anything with, we hit a dead end clearly
-            if ($candidateCount == 0) {
+            if ($candidateCount === 0) {
                 return false;
             }
 
             // We're looking for a move with fewest possible options - speeds things up
-            if ($candidateCount < $optimalCell['moveCount']) {
-                $optimalCell = $emptyCell;
-                $optimalCell['moveCount'] = $candidateCount;
-                $optimalCell['moves'] = $candidates;
+            if ($candidateCount < $optimalCellMoveCount) {
+                $optimalCellMoveCount = $candidateCount;
+                $optimalCandidates = $candidates;
+                $x = $emptyCell['x'];
+                $y = $emptyCell['y'];
 
                 if ($candidateCount == 1) {
                     break;
@@ -242,14 +243,10 @@ class HackyButFast implements Solver
         }
 
         // If there is a move to be made, let's make it!
-        if (isset($optimalCell['moves'])) {
-            $x = $optimalCell['x'];
-            $y = $optimalCell['y'];
-
-            $validMoves = $optimalCell['moves'];
+        if (isset($optimalCandidates)) {;
 
             // Loop through possible values
-            foreach ($validMoves as $try) {
+            foreach ($optimalCandidates as $try) {
                 // Set value
                 $this->grid[$x][$y] = $try;
 

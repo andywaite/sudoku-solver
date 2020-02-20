@@ -115,23 +115,35 @@ class HackyButFastV2 implements Solver
     /**
      * Attempt to solve a Sudoku puzzle
      *
-     * @param int|null $lastX
-     * @param int|null $lastY
+     * @param int $emptyLastTime
      * @return bool
      * @throws \Exception
      */
-    protected function recursiveSolve(): bool
+    protected function recursiveSolve($emptyLastTime = 100): bool
     {
         $x = null;
         $y = null;
         $forRollback = [];
         $bestCandidateCount = 10;
+        $emptyThisTime = 0;
+        $bestCandidates = null;
 
         // Find out what valid moves we have for each empty cell
         foreach ($this->grid as $gX => $col) {
             foreach ($col as $gY => $value) {
                 if ($value === null) {
-                    $candidates = $this->getCandidates($gX, $gY);
+                    $candidates = [
+                        1, 2, 3, 4, 5, 6, 7, 8, 9
+                    ];
+
+                    foreach ($this->peers[$gX][$gY] as $peer) {
+                        if ($this->grid[$peer[0]][$peer[1]] === null) {
+                            continue;
+                        }
+
+                        unset($candidates[$this->grid[$peer[0]][$peer[1]]- 1]);
+                    }
+
                     $candidateCount = count($candidates);
 
                     // If there's any cell we can't do anything with, we hit a dead end clearly
@@ -144,13 +156,21 @@ class HackyButFastV2 implements Solver
 
                     // Only one option, do that 1st
                     if ($candidateCount === 1) {
-                        $this->grid[$gX][$gY] = $candidates[0];
+                        unset($bestCandidates);
+                        $this->grid[$gX][$gY] = reset($candidates);
                         $forRollback[] = [$gX, $gY];
                         continue;
                     }
 
+                    $emptyThisTime++;
+
+                    if ($emptyThisTime === $emptyLastTime) {
+                        continue 2;
+                    }
+
                     if ($candidateCount < $bestCandidateCount) {
                         $bestCandidateCount = $candidateCount;
+                        $bestCandidates = $candidates;
                         $x = $gX;
                         $y = $gY;
                     }
@@ -161,14 +181,26 @@ class HackyButFastV2 implements Solver
 
         // If there is a move to be made, let's make it!
         if (isset($x)) {
-            $optimalCandidates = $this->getCandidates($x, $y);
+            if (!isset($bestCandidates)) {
+                $bestCandidates = [
+                    1, 2, 3, 4, 5, 6, 7, 8, 9
+                ];
+
+                foreach ($this->peers[$x][$y] as $peer) {
+                    if ($this->grid[$peer[0]][$peer[1]] === null) {
+                        continue;
+                    }
+
+                    unset($bestCandidates[$this->grid[$peer[0]][$peer[1]] - 1]);
+                }
+            }
             // Loop through possible values
-            foreach ($optimalCandidates as $try) {
+            foreach ($bestCandidates as $try) {
                 // Set value
                 $this->grid[$x][$y] = $try;
 
                 // Recursively solve
-                if ($this->recursiveSolve()) {
+                if ($this->recursiveSolve($emptyThisTime)) {
                     // Yay, solved!
                     return true;
                 }
